@@ -1,12 +1,12 @@
 # MedLoop — Hyperlocal Medical Equipment Registry & Custody Tracker
 
-MedLoop is a backend registry built with **Python 3.11**, **FastAPI**, and **MongoDB (PyMongo)** that matches available home-care medical equipment (`wheelchair`, `hospital_bed`, `oxygen_concentrator`, `nebulizer`, `walker`, `bp_monitor`) to nearby patients within a 25 km radius and maintains an auditable, append-only history of inspections, sanitizations, and custody handovers.
+MedLoop is a backend registry built with  Python 3.11 ,  FastAPI , and  MongoDB (PyMongo)  that matches available home-care medical equipment (`wheelchair`, `hospital_bed`, `oxygen_concentrator`, `nebulizer`, `walker`, `bp_monitor`) to nearby patients within a 25 km radius and maintains an auditable, append-only history of inspections, sanitizations, and custody handovers.
 
 ## Framing & Regulatory Disclaimer
 
-- **Workflow Enforcement Only**: This system does **NOT** verify physical safety. It enforces and records a verification workflow (inspection, sanitization, and custody transitions) so condition claims are traceable and auditable.
-- **Synthetic Dataset**: All users, devices, lifecycle events, and patient requests in this repository are 100% synthetic and deterministically generated via `scripts/seed.py`.
-- **Regulatory & Liability Context (India)**: In the real world, refurbishing, redistributing, or reusing medical devices—particularly active respiratory and patient-support devices such as oxygen concentrators, nebulizers, and hospital beds—carries regulatory and clinical liability implications in India under the **Central Drugs Standard Control Organization (CDSCO)** and the *Medical Devices Rules, 2017*.
+-  Workflow Enforcement Only : This system does  NOT  verify physical safety. It enforces and records a verification workflow (inspection, sanitization, and custody transitions) so condition claims are traceable and auditable.
+-  Synthetic Dataset : All users, devices, lifecycle events, and patient requests in this repository are 100% synthetic and deterministically generated via `scripts/seed.py`.
+-  Regulatory & Liability Context (India) : In the real world, refurbishing, redistributing, or reusing medical devices—particularly active respiratory and patient-support devices such as oxygen concentrators, nebulizers, and hospital beds—carries regulatory and clinical liability implications in India under the  Central Drugs Standard Control Organization (CDSCO)  and the *Medical Devices Rules, 2017*.
 
 ## Tech Stack
 
@@ -25,12 +25,12 @@ MedLoop is a backend registry built with **Python 3.11**, **FastAPI**, and **Mon
 
 | Syllabus Unit | Core DBMS / NoSQL Topic | MedLoop Implementation |
 | :--- | :--- | :--- |
-| **Unit I** | Introduction to NoSQL, SQL vs NoSQL, CAP Theorem | Polymorphic `devices.specs` documents vs sparse SQL tables; MongoDB Atlas replica set CP trade-off documented in `docs/design.md`. |
-| **Unit II** | Document Data Modeling, Embedding vs Referencing, Schema Validation | **1:1** embedded `specs`; **1:N** referenced append-only `events` (unbounded growth); **M:N** `users.certified_categories`; strict `$jsonSchema` validators and `Decimal128` in `db/setup.py`. |
-| **Unit III** | CRUD Operations, Atomic Updates, Concurrency Control | `insert_one`, `insert_many` (batched in 1,000s), and atomic compare-and-swap transitions via `find_one_and_update({"_id": id, "status": current_status})` in `app/main.py`. |
-| **Unit IV** | Indexing Strategies & Query Optimization (`explain`) | Compound (`{category: 1, status: 1}`), ESR compound (`{device_id: 1, ts: -1}`), `2dsphere`, `TEXT`, and `TTL` (`expireAfterSeconds: 0`) indexes in `db/setup.py`; `COLLSCAN` vs `IXSCAN` and covered query (`totalDocsExamined = 0`) in `scripts/benchmark.py`. |
-| **Unit V** | Aggregation Framework & Geospatial Queries | 3 multi-stage pipelines in `db/pipelines.py`: overdue compliance (`$match` $\rightarrow$ `$lookup` $\rightarrow$ `$project`), demand vs supply gap (`$group` $\rightarrow$ `$lookup` $\rightarrow$ `$project`), and 25 km matching (`$geoNear`). |
-| **Unit VI** | Applied Analytics, Forecasting & Production Security | 28-day moving-average shortage forecast in `GET /analytics/shortages` to prioritize refurbishment; production security notes (least-privilege user, IP allowlist, backups, TTL, `.env`) in `docs/design.md`. |
+|  Unit I  | Introduction to NoSQL, SQL vs NoSQL, CAP Theorem | Polymorphic `devices.specs` documents vs sparse SQL tables; MongoDB Atlas replica set CP trade-off documented in `docs/design.md`. |
+|  Unit II  | Document Data Modeling, Embedding vs Referencing, Schema Validation |  1:1  embedded `specs`;  1:N  referenced append-only `events` (unbounded growth);  M:N  `users.certified_categories`; strict `$jsonSchema` validators and `Decimal128` in `db/setup.py`. |
+|  Unit III  | CRUD Operations, Atomic Updates, Concurrency Control | `insert_one`, `insert_many` (batched in 1,000s), and atomic compare-and-swap transitions via `find_one_and_update({"_id": id, "status": current_status})` in `app/main.py`. |
+|  Unit IV  | Indexing Strategies & Query Optimization (`explain`) | Compound (`{category: 1, status: 1}`), ESR compound (`{device_id: 1, ts: -1}`), `2dsphere`, `TEXT`, and `TTL` (`expireAfterSeconds: 0`) indexes in `db/setup.py`; `COLLSCAN` vs `IXSCAN` and covered query (`totalDocsExamined = 0`) in `scripts/benchmark.py`. |
+|  Unit V  | Aggregation Framework & Geospatial Queries | 3 multi-stage pipelines in `db/pipelines.py`: overdue compliance (`$match` $\rightarrow$ `$lookup` $\rightarrow$ `$project`), demand vs supply gap (`$group` $\rightarrow$ `$lookup` $\rightarrow$ `$project`), and 25 km matching (`$geoNear`). |
+|  Unit VI  | Applied Analytics, Forecasting & Production Security | 28-day moving-average shortage forecast in `GET /analytics/shortages` to prioritize refurbishment; production security notes (least-privilege user, IP allowlist, backups, TTL, `.env`) in `docs/design.md`. |
 
 ## Repository Structure
 
@@ -59,33 +59,33 @@ medloop/
 
 ## Setup & Installation Steps
 
-1. **Clone the repository and enter the directory**:
+1.  Clone the repository and enter the directory :
    ```bash
    git clone <your-repo-url> medloop
    cd medloop
    ```
-2. **Create and activate a Python 3.11 virtual environment**:
+2.  Create and activate a Python 3.11 virtual environment :
    ```bash
    python3.11 -m venv .venv
    source .venv/bin/activate
    ```
-3. **Install pinned dependencies**:
+3.  Install pinned dependencies :
    ```bash
    pip install -r requirements.txt
    ```
-4. **Copy `.env.example` to `.env` and configure your MongoDB URI**:
+4.  Copy `.env.example` to `.env` and configure your MongoDB URI :
    ```bash
    cp .env.example .env
    ```
-5. **Create collections, `$jsonSchema` validators, and indexes**:
+5.  Create collections, `$jsonSchema` validators, and indexes :
    ```bash
    python -m db.setup
    ```
-6. **Seed the synthetic dataset (30 users, 2,000 devices, 50,000+ events, 1,500 requests)**:
+6.  Seed the synthetic dataset (30 users, 2,000 devices, 50,000+ events, 1,500 requests) :
    ```bash
    python -m scripts.seed
    ```
-7. **Start the FastAPI server**:
+7.  Start the FastAPI server :
    ```bash
    uvicorn app.main:app --reload
    ```
@@ -93,11 +93,11 @@ medloop/
 
 ## Running Unit Tests & Index Benchmarks
 
-- **Run the state machine unit tests**:
+-  Run the state machine unit tests :
   ```bash
   pytest
   ```
-- **Run the `explain("executionStats")` benchmark and generate `docs/benchmark-results.md`**:
+-  Run the `explain("executionStats")` benchmark and generate `docs/benchmark-results.md` :
   ```bash
   python -m scripts.benchmark
   ```
@@ -144,26 +144,26 @@ curl -X GET "http://127.0.0.1:8000/analytics/shortages"
 
 ## Screenshot Placeholders (For Project Report / Viva)
 
-- **Swagger UI (`/docs`)**:
+-  Swagger UI (`/docs`) :
   `![Swagger UI Endpoints](docs/screenshots/swagger-ui-placeholder.png)`
-- **MongoDB Compass Schema & Indexes View**:
+-  MongoDB Compass Schema & Indexes View :
   `![MongoDB Compass Collections and Indexes](docs/screenshots/compass-indexes-placeholder.png)`
-- **Benchmark Execution Output (`docs/benchmark-results.md`)**:
+-  Benchmark Execution Output (`docs/benchmark-results.md`) :
   `![Benchmark Execution Stats](docs/screenshots/benchmark-results-placeholder.png)`
 
 ## Limitations
 
-1. **Synthetic Data Only**: All 2,000 devices, 50,000+ events, and 1,500 patient requests are generated by `scripts/seed.py` using seeded random distributions (`seed=42`); they do not represent real clinical inventory.
-2. **No Physical Verification**: MedLoop records human-entered workflow events (`inspected`, `sanitized`) and enforces state transition ordering, but cannot physically test oxygen purity, electrical insulation, or microbial sterilization.
-3. **CDSCO & Clinical Liability**: Real-world deployment in India requires compliance with CDSCO *Medical Devices Rules, 2017*, biomedical engineering sign-off, and patient indemnity frameworks.
-4. **No Authentication / Authorization**: To keep the codebase focused on MongoDB data modeling, indexing, and aggregation pipelines, actor IDs are passed directly in request bodies without JWT/OAuth2 middleware.
+1.  Synthetic Data Only : All 2,000 devices, 50,000+ events, and 1,500 patient requests are generated by `scripts/seed.py` using seeded random distributions (`seed=42`); they do not represent real clinical inventory.
+2.  No Physical Verification : MedLoop records human-entered workflow events (`inspected`, `sanitized`) and enforces state transition ordering, but cannot physically test oxygen purity, electrical insulation, or microbial sterilization.
+3.  CDSCO & Clinical Liability : Real-world deployment in India requires compliance with CDSCO *Medical Devices Rules, 2017*, biomedical engineering sign-off, and patient indemnity frameworks.
+4.  No Authentication / Authorization : To keep the codebase focused on MongoDB data modeling, indexing, and aggregation pipelines, actor IDs are passed directly in request bodies without JWT/OAuth2 middleware.
 
 ## Future Work
 
-- **Multi-Document ACID Transactions**: Wrap the `devices` status update and `events` insertion inside a replica-set client session (`with client.start_session() as session: with session.start_transaction(): ...`) for strict cross-collection atomicity.
-- **Role-Based Access Control (RBAC)**: Verify via FastAPI dependency injection that only users with `role == "inspector"` and matching `certified_categories` can execute `listed -> inspected` transitions.
-- **IoT Telemetry Integration**: Stream real-time compressor runtime hours and oxygen purity alerts into a MongoDB Time Series collection.
+-  Multi-Document ACID Transactions : Wrap the `devices` status update and `events` insertion inside a replica-set client session (`with client.start_session() as session: with session.start_transaction(): ...`) for strict cross-collection atomicity.
+-  Role-Based Access Control (RBAC) : Verify via FastAPI dependency injection that only users with `role == "inspector"` and matching `certified_categories` can execute `listed -> inspected` transitions.
+-  IoT Telemetry Integration : Stream real-time compressor runtime hours and oxygen purity alerts into a MongoDB Time Series collection.
 
 ## License
 
-Released under the **MIT License** for academic and educational use.
+Released under the  MIT License  for academic and educational use.
